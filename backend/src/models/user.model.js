@@ -27,7 +27,7 @@ const userSchema = new Schema(
          },
          profilepic : {
             type : String,
-            required : true,
+            // required : true,
          },
          coverpic:{
             type : String
@@ -82,7 +82,7 @@ userSchema.methods.generateRefreshToken = function(){
         },
         process.env.REFRESH_TOKEN_SECRET,
         {
-            expiresIn : process.env.ACCESS_TOKEN_EXPIRY
+            expiresIn : process.env.REFRESH_TOKEN_EXPIRY
         }
     )
 }
