@@ -6,7 +6,7 @@ const router = Router();
 
 
 
-router.route("/signup").post(
+router.route("signup").post(
     upload.fields([
         {
             name : "profilePic",
@@ -14,12 +14,14 @@ router.route("/signup").post(
 
         },
         {
-            name : "coverpic",
+            name : "coverPic",
             maxCount : 2
         }
 
     ]),
     userRegistration)
+   
+    
 
 
 export default router

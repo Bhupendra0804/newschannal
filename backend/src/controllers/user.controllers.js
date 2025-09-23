@@ -1,8 +1,8 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js"
 import { User } from "../models/user.model.js";
-import { uploadPhotoOnCloudinary } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
+import { uploadOnCloudinary } from "../utils/cloudinary.js";
 
 const userRegistration = asyncHandler(async (req, res) => {
     const { email, username, fullname, password } = req.body; //get user Details
@@ -19,33 +19,28 @@ const userRegistration = asyncHandler(async (req, res) => {
         throw new ApiError(409, "User alredy Exist", userExist)
     }
 
-    const profilepicLoaclPath = await req.files?.profilepic[0]?.path;
-    console.log(profilepicLoaclPath);
-    
-    if (!profilepicLoaclPath) {
-        throw new ApiError(400, "Avatar file is reqired")
-    }
+    const profileLocalPath = await req.files?.profilePic[0]?.path;
+    const coverLocalPath =await req.files?.coverPic[0]?.path;
 
-    const profile = await uploadPhotoOnCloudinary(profilepicLoaclPath)
-
-    const coverpicLocalpath = await req.files?.coverpic[0]?.path;
-    if (!coverpicLocalpath) {
-        throw new ApiError(400, "cover photo is reqired")
+    if(!profileLocalPath){
+        throw new ApiError(400, "Profile Pic Requier")
     }
-    const cover = await uploadPhotoOnCloudinary(coverpicLocalpath) 
+    const profilePic = await uploadOnCloudinary(profileLocalPath);
+    const coverPic = await uploadOnCloudinary(coverLocalPath);
+
 
     const userData = await User.create(
         {
-            fullname,
             username,
             email,
+            fullname,
+            profilepic : profilePic.url || "",
+            coverpic : coverPic.url || "",
             password,
-            profilepic : profile.url || "",
-            coverpic : cover.url || ""
         }
     )
-
-    const checkUser = await User.findById(userData._id).select(-password -refreshToken )
+    // console.log(userData)
+    const checkUser = await User.findById(userData._id).select("-password -refreshToken" )
     if(!checkUser){
         throw new ApiError(500, "User Creation failed due to while register wrong Entry in the field")
     }
